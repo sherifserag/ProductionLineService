@@ -21,7 +21,7 @@ namespace ProductionLineService.Services
 			try
 			{
 				// Add this line to manually confirm the service layer is receiving the array
-				Console.WriteLine($"Service is attempting to insert {logBatch.Count()} records.");
+				Console.WriteLine($"Service is not attempting to insert {logBatch.Count()} records.");
 
 				await _context.ProductionLogs.AddRangeAsync(logBatch);
 				await _context.SaveChangesAsync();
