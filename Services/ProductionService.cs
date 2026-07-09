@@ -20,10 +20,11 @@ namespace ProductionLineService.Services
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
-				// Add this line to manually confirm the service layer is receiving the array
-				Console.WriteLine($"Service is not attempting to insert {logBatch.Count()} records.");
+                // Add this line to manually confirm the service layer is receiving the array
+                //Console.WriteLine($"Service is not attempting to insert {logBatch.Count()} records.");
+                Console.WriteLine($"This Line Was Updated {logBatch.Count()} records.");
 
-				await _context.ProductionLogs.AddRangeAsync(logBatch);
+                await _context.ProductionLogs.AddRangeAsync(logBatch);
 				await _context.SaveChangesAsync();
 
 				await transaction.CommitAsync();
