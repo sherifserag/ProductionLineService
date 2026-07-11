@@ -24,18 +24,11 @@ namespace ProductionLineService.Services
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
-				Console.WriteLine($"Service is now attempting to insert {logBatch.Count()} records.");
+                // Add this line to manually confirm the service layer is receiving the array
+                //Console.WriteLine($"Service is not attempting to insert {logBatch.Count()} records.");
+                Console.WriteLine($"This Line Was Updated {logBatch.Count()} records.");
 
-				var entities = logBatch.Select(log => new ProductionLogDto
-				{
-					Status = log.Status,
-					Throughput = log.Throughput,
-					Message = log.Message,
-					Operator = log.Operator,
-					Timestamp = log.Timestamp
-				}).ToList();
-
-				await _context.ProductionLogs.AddRangeAsync(entities);
+                await _context.ProductionLogs.AddRangeAsync(logBatch);
 				await _context.SaveChangesAsync();
 
 				await transaction.CommitAsync();
