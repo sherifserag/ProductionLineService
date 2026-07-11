@@ -8,7 +8,16 @@ using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowViteApp",
+		policy =>
+		{
+			policy.WithOrigins("http://localhost:5173")
+				  .AllowAnyHeader()
+				  .AllowAnyMethod();
+		});
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -20,7 +29,7 @@ builder.Services.AddSwaggerGen();
 // Register DbContext with SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IProductionService, ProductionService>();
 
 builder.Services.AddSignalR();
@@ -56,6 +65,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowViteApp");
 
 app.UseAuthorization();
 
