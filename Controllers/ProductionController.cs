@@ -39,5 +39,20 @@ namespace ProductionLineService.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error starting production" });
 			}
 		}
-	}
+
+		[HttpGet("get-Production-Logs")]
+		public async Task<IActionResult> GetProductionLogs()
+		{
+			try
+			{
+				var productionLogs = await _productionService.GetProductionLogsAsync();
+				return Ok(productionLogs);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error retrieving production logs");
+				return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error retrieving production logs" });
+			}
+		}
+}
 }

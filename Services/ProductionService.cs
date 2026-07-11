@@ -10,13 +10,17 @@ namespace ProductionLineService.Services
 	{
 		private readonly AppDbContext _context;
 		private readonly IHubContext<ProductionHub, IProductionClient> _hubContext;
-		public ProductionService(AppDbContext context,IHubContext<ProductionHub, IProductionClient> hubContext)
+
+		public ProductionService(AppDbContext context, IHubContext<ProductionHub, IProductionClient> hubContext)
 		{
 			_context = context;
 			_hubContext = hubContext;
 		}
+
 		public async Task ProcessBatchAsync(IEnumerable<ProductionLogDto> logBatch)
 		{
+			if (logBatch == null || !logBatch.Any()) return;
+
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
@@ -29,7 +33,17 @@ namespace ProductionLineService.Services
 
 				await transaction.CommitAsync();
 
-				await _hubContext.Clients.All.OnLogBatchInserted(logBatch);
+				var updatedDtoBatch = entities.Select(log => new ProductionLogDto
+				{
+					LineId = log.LineId,
+					Status = log.Status,
+					Throughput = log.Throughput,
+					Message = log.Message,
+					Operator = log.Operator,
+					Timestamp = log.Timestamp
+				}).ToList();
+
+				await _hubContext.Clients.All.OnLogBatchInserted(updatedDtoBatch);
 			}
 			catch (Exception ex)
 			{
@@ -37,6 +51,21 @@ namespace ProductionLineService.Services
 				Console.WriteLine($"Database Write Failed: {ex.Message}");
 				throw;
 			}
+		}
+
+		public async Task<IEnumerable<ProductionLogDto>> GetProductionLogsAsync()
+		{
+			return await _context.ProductionLogs
+				.Select(log => new ProductionLogDto
+				{
+					LineId = log.LineId,
+					Status = log.Status,
+					Throughput = log.Throughput,
+					Message = log.Message,
+					Operator = log.Operator,
+					Timestamp = log.Timestamp
+				})
+				.ToListAsync();
 		}
 	}
 }
