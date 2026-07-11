@@ -18,6 +18,17 @@ builder.Services.AddCors(options =>
 				  .AllowAnyMethod();
 		});
 });
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("CorsPolicy", policy =>
+	{
+		policy.WithOrigins("http://localhost:5173") // Must be your exact React port
+			  .AllowAnyHeader()
+			  .AllowAnyMethod()
+			  .AllowCredentials(); // This fixes the specific error you are seeing
+	});
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -63,6 +74,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 

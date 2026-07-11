@@ -6,5 +6,6 @@ namespace ProductionLineService.Services
 	{
 
 		Task ProcessBatchAsync(IEnumerable<ProductionLogDto> LogBatch);
+		Task<IEnumerable<ProductionLogDto>> GetProductionLogsAsync();
 	}
 }
